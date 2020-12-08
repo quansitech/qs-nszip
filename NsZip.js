@@ -11,6 +11,7 @@ class NsZip{
 
         this.files = [];
         this.events = {};
+        this.eachZipUploadStream = null;
     }
 
     async total(){
@@ -69,6 +70,40 @@ class NsZip{
             await this.client.getStream(file, progressStream);
             this.archive.append(progressStream, { name: file.split('/').pop() });
         }
+        this.archive.finalize();
+    }
+
+    eachZip(readable, fileName, zipObject){
+        const that = this;
+        this.zipObject = zipObject;
+
+        if(this.eachZipUploadStream === null){
+            this.eachZipUploadStream = new Writable({
+
+                async write(chunk, encoding, callback) {
+                    
+                    await that.client.append(that.zipObject, chunk)
+                    
+                    callback();
+                }
+            });
+
+            this.eachZipUploadStream.on('finish', async () => {
+                await this.client.appendFinish(this.zipObject);
+    
+                if(typeof this.events['finish'] == 'function'){
+                    this.events['finish'].call(this);
+                    this.eachZipUploadStream = null;
+                }
+            });
+
+            this.archive.pipe(this.eachZipUploadStream);
+        }
+
+        this.archive.append(readable, { name: fileName });
+    }
+
+    eachZipFinish(){
         this.archive.finalize();
     }
 

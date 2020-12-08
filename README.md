@@ -29,7 +29,7 @@ const nszip = new NsZip("AliOss", {
 });
 
 //设置需压缩的源文件和目标文件
-//第一个参数，需要压缩的文件列表
+//第一个参数，需要压缩的文件列表，网络存储文件地址
 //第二个参数，生成的压缩包文件
 nszip.attach([
     'object1',
@@ -64,7 +64,7 @@ const nszip = new NsZip("TencentCos", {
 });
 
 //设置需压缩的源文件和目标文件
-//第一个参数，需要压缩的文件列表
+//第一个参数，需要压缩的文件列表，网络存储文件地址
 //第二个参数，生成的压缩包文件
 nszip.attach([
     'object1',
@@ -84,4 +84,48 @@ nszip.on('finish', () => {
 });
 
 nszip.run() //开始压缩，异步操作。
+```
+
+### 网络流压缩上传
+适合一边请求网络资源，一边添加压缩流上传
+
++ 轮询压缩上传API
+
+//第一个参数 可读流对象, 可以是网络流
+//第二个参数 添加进压缩包的文件名
+//第三个参数 需要存放网络存储的压缩文件路径
+echoZip(readableStream, '文件名', '网络存储的压缩文件路径');
+
++ 轮询压缩结束API
+
+//结束轮询压缩
+eachZipFinish();
+
+ PS.网络流压缩上传由于无法确定需要压缩上传的数量，因此无法预测进度完成情况， 不支持 progress事件
+
+举例
+```javascript
+//监听最终完成事件
+nszip.on('finish', () => {
+    console.log('finish');
+});
+
+let index=0;
+for(let i=0; i< 100; i++){
+    fetch("http://demo.test/5ec98e24e5326.jpg").then(res => {
+        const resIndex = ++index;
+        
+        if(res.status == 200){
+            nszip.eachZip(res.body, `${i}.jpg`, 'testFillZip.zip');
+            //监听流结束事件
+            res.body.on('close', () => {
+                //最后一个流处理结束后触发压缩完成处理
+                if(resIndex == 100){
+                    nszip.eachZipFinish();
+                }
+                console.log('resIndex:' + resIndex);
+            });
+        }
+    });
+}
 ```
