@@ -12,6 +12,7 @@ class NsZip{
         this.files = [];
         this.events = {};
         this.eachZipUploadStream = null;
+        this.abort = false;
     }
 
     async total(){
@@ -34,11 +35,19 @@ class NsZip{
         const uploadStream = new Writable({
 
             async write(chunk, encoding, callback) {
+
+                if(that.abort){
+                    this.destroy('user cancel');
+                }
                 
                 await that.client.append(that.zipObject, chunk)
                 
                 callback();
             }
+        });
+
+        uploadStream.on('error', async () => {
+            await this.client.abort(this.zipObject);
         });
         
         uploadStream.on('finish', async () => {
@@ -81,11 +90,18 @@ class NsZip{
             this.eachZipUploadStream = new Writable({
 
                 async write(chunk, encoding, callback) {
+                    if(that.abort){
+                        this.destroy('user cancel');
+                    }
                     
                     await that.client.append(that.zipObject, chunk)
                     
                     callback();
                 }
+            });
+
+            this.eachZipUploadStream.on('error', async () => {
+                await this.client.abort(this.zipObject);
             });
 
             this.eachZipUploadStream.on('finish', async () => {
@@ -105,6 +121,10 @@ class NsZip{
 
     eachZipFinish(){
         this.archive.finalize();
+    }
+
+    abortZip(){
+        this.abort = true;
     }
 
     on(event, cb){

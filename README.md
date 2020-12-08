@@ -13,8 +13,54 @@ npm i @quansitech/qs-nszip
 + AliOss
 + TencentCos
 
+## API
++ 添加需要压缩的存储对象
+
+//第一个参数 需要压缩的存储对象数组
+
+//第二个参数 生成的压缩对象
+
+attach([object1, object2, ...], zipObject);
+
+
++ 开始压缩并上传
+
+run() //配合attach使用
+
++ 监听事件
+
+//event: 'progress', 'finish'
+
+//progress事件返回进度百分比
+
+on(event, function callback(){})
+
++ 轮询压缩上传
+
+//第一个参数 可读流对象, 可以是网络流
+
+//第二个参数 添加进压缩包的文件名
+
+//第三个参数 需要存放网络存储的压缩文件路径
+
+eachZip(readableStream, '文件名', '网络存储的压缩文件路径');
+
+ PS.网络流压缩上传由于无法确定需要压缩上传的数量，因此无法预测进度完成情况， 不支持 progress事件
+
++ 轮询压缩完成
+
+//完成轮询压缩
+
+eachZipFinish();
+
++ 中止压缩
+
+abortZip();
+
 
 ## 用法
+
+1. 获取网络存储对象，并压缩上传回网络存储
 + AliOss
 ```javascript
 const NsZip = require("NsZip");
@@ -86,28 +132,7 @@ nszip.on('finish', () => {
 nszip.run() //开始压缩，异步操作。
 ```
 
-### 网络流压缩上传
-适合一边请求网络资源，一边添加压缩流上传
-
-+ 轮询压缩上传API
-
-//第一个参数 可读流对象, 可以是网络流
-
-//第二个参数 添加进压缩包的文件名
-
-//第三个参数 需要存放网络存储的压缩文件路径
-
-eachZip(readableStream, '文件名', '网络存储的压缩文件路径');
-
-+ 轮询压缩结束API
-
-//结束轮询压缩
-
-eachZipFinish();
-
- PS.网络流压缩上传由于无法确定需要压缩上传的数量，因此无法预测进度完成情况， 不支持 progress事件
-
-举例
+2. 一边下载网络资源，一边压缩上传至网络存储
 ```javascript
 //监听最终完成事件
 nszip.on('finish', () => {
@@ -124,10 +149,9 @@ for(let i=0; i< 100; i++){
             //监听流结束事件
             res.body.on('close', () => {
                 //最后一个流处理结束后触发压缩完成处理
-                if(resIndex == 100){
+                if(res.body.eachZipindex == 100){
                     nszip.eachZipFinish();
                 }
-                console.log('resIndex:' + resIndex);
             });
         }
     });

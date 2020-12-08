@@ -114,6 +114,22 @@ class TencentCos{
         this.multiparts = [];
         this.currentChunk = null;
     }
+
+    async abort(cosObject){
+        if(!this.multipartUploadId){
+            throw new Error('multipartUploadId not exists!');
+        }
+
+        const data = await this.promiseWrap(this.client.multipartAbort, {
+            Bucket: this.bucket,
+            Region: this.region,
+            Key: cosObject,
+            UploadId: this.multipartUploadId
+        });
+
+        this.initMultipart();
+        return data;
+    }
 }
 
 module.exports = TencentCos;

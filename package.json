@@ -12,5 +12,8 @@
     "ali-oss": "^6.11.2",
     "archiver": "^5.1.0",
     "cos-nodejs-sdk-v5": "^2.8.3"
+  },
+  "devDependencies": {
+    "node-fetch": "^2.6.1"
   }
 }

@@ -47,6 +47,11 @@ class AliOss{
 
         this.currentChunk = null;
     }
+
+    async abort(ossObject){
+        const res = await this.client.delete(ossObject);
+        return res;
+    }
 }
 
 module.exports = AliOss
