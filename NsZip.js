@@ -126,6 +126,9 @@ class NsZip{
 
     abortZip(){
         this.abort = true;
+        if(typeof this.events['abort'] == 'function'){
+            this.events['abort'].call(this);
+        }
     }
 
     on(event, cb){
@@ -134,9 +137,6 @@ class NsZip{
 
     async triggerStreamErr(){
         await this.client.abort(this.zipObject);
-        if(typeof this.events['abort'] == 'function'){
-            this.events['abort'].call(this);
-        }
     }
 }
 
