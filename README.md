@@ -29,9 +29,13 @@ run() //配合attach使用
 
 + 监听事件
 
-//event: 'progress', 'finish'
+//event: 'progress', 'finish', 'abort'
 
 //progress事件返回进度百分比
+
+//finish事件 在压缩上传完成后触发
+
+//abort事件 调用abortZip方法后触发
 
 on(event, function callback(){})
 
@@ -54,6 +58,8 @@ eachZip(readableStream, '文件名', '网络存储的压缩文件路径');
 eachZipFinish();
 
 + 中止压缩
+
+//上传流会销毁，并清空上传碎片和文件
 
 abortZip();
 

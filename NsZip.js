@@ -5,6 +5,7 @@ const archiver = require('archiver');
 class NsZip{
 
     constructor(nsType, options){
+        
         this.client = storage.instance(nsType, options);
 
         this.archive =  archiver('zip', { zlib: { level: 9 } });
@@ -47,7 +48,7 @@ class NsZip{
         });
 
         uploadStream.on('error', async () => {
-            await this.client.abort(this.zipObject);
+            await this.triggerStreamErr();
         });
         
         uploadStream.on('finish', async () => {
@@ -101,7 +102,7 @@ class NsZip{
             });
 
             this.eachZipUploadStream.on('error', async () => {
-                await this.client.abort(this.zipObject);
+                await this.triggerStreamErr();
             });
 
             this.eachZipUploadStream.on('finish', async () => {
@@ -130,11 +131,13 @@ class NsZip{
     on(event, cb){
         this.events[event] = cb;
     }
+
+    async triggerStreamErr(){
+        await this.client.abort(this.zipObject);
+        if(typeof this.events['abort'] == 'function'){
+            this.events['abort'].call(this);
+        }
+    }
 }
 
 module.exports = NsZip;
-
-
-
-
-
