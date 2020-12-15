@@ -36,7 +36,7 @@ class AliOss{
     }
 
     async appendFinish(ossObject){
-        if(this.currentChunk.length > 0){
+        if(this.currentChunk && this.currentChunk.length > 0){
             await this.appendChunk(ossObject);
         }
     }

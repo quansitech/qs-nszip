@@ -92,7 +92,7 @@ class TencentCos{
     }
 
     async appendFinish(cosObject){
-        if(this.currentChunk.length > 0){
+        if(this.currentChunk && this.currentChunk.length > 0){
             await this.uploadMultipart(cosObject);
         }
 
