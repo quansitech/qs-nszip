@@ -69,7 +69,7 @@ abortZip();
 1. 获取网络存储对象，并压缩上传回网络存储
 + AliOss
 ```javascript
-const NsZip = require("NsZip");
+const NsZip = require("@quansitech/NsZip");
 
 //实例化，对应的参数查看阿里云OSS配置
 const nszip = new NsZip("AliOss", {
@@ -162,4 +162,19 @@ for(let i=0; i< 100; i++){
         }
     });
 }
+```
+
+
+#### 自定义分片大小
+
+实例化时设置option.miniChunkSize
+
+```javascript
+const nszip = new NsZip("TencentCos", {
+   SecretId: '',
+   SecretKey: '',
+   Bucket: '',
+   Region: '',
+   miniChunkSize: 100 * 1024*1024 //100Mb
+});
 ```

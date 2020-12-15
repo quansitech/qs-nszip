@@ -5,7 +5,7 @@ class AliOss{
     constructor(option){
         this.client = new OSS(option);
         this.chunkTotal = 0;
-        this.miniChunkSize = 1024*1024;
+        this.miniChunkSize = option.miniChunkSize ? option.miniChunkSize : 1024*1024;
         this.currentChunk = null;
     }
 

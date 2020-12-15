@@ -8,7 +8,7 @@ class TencentCos{
         
         this.bucket = option.Bucket;
         this.region = option.Region;
-        this.miniChunkSize = 1024*1024;
+        this.miniChunkSize = option.miniChunkSize ? option.miniChunkSize : 1024*1024;
 
         this.initMultipart();
     }
