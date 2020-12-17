@@ -117,7 +117,8 @@ class TencentCos{
 
     async abort(cosObject){
         if(!this.multipartUploadId){
-            throw new Error('multipartUploadId not exists!');
+            //throw new Error('multipartUploadId not exists!');
+            return;
         }
 
         const data = await this.promiseWrap(this.client.multipartAbort, {
