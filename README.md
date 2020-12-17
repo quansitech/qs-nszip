@@ -31,11 +31,13 @@ run() //配合attach使用
 
 //event: 'progress', 'finish', 'abort'
 
-//progress事件返回进度百分比
+//progress事件返回进度百分比 (eachZip模式由于无法预先确定需要处理的总量，因此不会触发progress事件)
 
 //finish事件 在压缩上传完成后触发
 
 //abort事件 调用abortZip方法后触发
+
+//error事件 产生异常时触发，并且返回异常对象
 
 on(event, function callback(){})
 
