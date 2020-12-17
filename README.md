@@ -29,7 +29,7 @@ run() //配合attach使用
 
 + 监听事件
 
-//event: 'progress', 'finish', 'abort'
+//event: 'progress', 'finish', 'abort', 'error'
 
 //progress事件返回进度百分比 (eachZip模式由于无法预先确定需要处理的总量，因此不会触发progress事件)
 

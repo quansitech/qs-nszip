@@ -48,7 +48,11 @@ class NsZip{
         for(const file of this.files){
             const progressStream = this.makeTransform();
 
-            await this.client.getStream(file, progressStream);
+            let [getStreamErr] = await this.errorCatch(this.client, this.client.getStream, file, progressStream);
+            if(getStreamErr){
+                return this.triggerError(getStreamErr);
+            }
+
             this.archive.append(progressStream, { name: file.split('/').pop() });
         }
         this.archive.finalize();
@@ -127,7 +131,6 @@ class NsZip{
     }
 
     eachZip(readable, fileName, zipObject){
-        const that = this;
         this.zipObject = zipObject;
 
         if(this.eachZipUploadStream === null){
@@ -196,8 +199,9 @@ class NsZip{
     }
 
     clearUploaded(){
+        const client = this.client;
         setTimeout(async () => {
-            let [err] = await this.errorCatch(this.client, this.client.abort, this.zipObject);
+            let [err] = await this.errorCatch(client, client.abort, this.zipObject);
 
             if(err){
                 this.triggerError(err);
@@ -236,7 +240,8 @@ class NsZip{
         this.archive =  null;
 
         this.files = [];
-        this.events = {};
+        this.events['finish'] && (this.events['finish'] = null);
+        this.events['progress'] && (this.events['progress'] = null);
         this.eachZipUploadStream = null;
         this.abort = false;
         this.currentSize = 0;
