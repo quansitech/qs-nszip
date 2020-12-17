@@ -107,7 +107,7 @@ nszip.run() //开始压缩，异步操作。
 
 + TencentCos
 ```javascript
-const NsZip = require("NsZip");
+const NsZip = require("@quansitech/NsZip");
 
 //实例化，对应的参数查看腾讯云COS配置
 const nszip = new NsZip("TencentCos", {
