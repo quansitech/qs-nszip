@@ -1,4 +1,5 @@
 const OSS = require('ali-oss');
+const { default: fetch } = require('node-fetch');
 
 class AliOss{
 
@@ -12,12 +13,28 @@ class AliOss{
     async size(ossObject){
         const headRes = await this.client.head(ossObject);
         return parseInt(headRes.res.headers['content-length']);
-   }
+    }
 
-    async getStream(ossObject, outputStream){
+    async sizeByProcess(ossObject, process){
+        const url = this.client.signatureUrl(ossObject, {
+            expires: 3600,
+            process
+        });
+
+        const res = await fetch(url);
+        const buff = await res.buffer();
+        return buff.length;
+    }
+
+    async getStream(ossObject, outPutStream){
         let objectRes = await this.client.getStream(ossObject);
+        objectRes.stream.pipe(outPutStream);
+    }
 
-        objectRes.stream.pipe(outputStream);
+    async getStreamByProcess(ossObject, process, outPutStream){
+        let objectRes = await this.client.getStream(ossObject, { process });
+
+        objectRes.stream.pipe(outPutStream);
     }
 
     async append(ossObject, chunk){

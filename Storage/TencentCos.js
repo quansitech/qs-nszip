@@ -1,5 +1,7 @@
 
 const COS = require('cos-nodejs-sdk-v5');
+const fetch = require('node-fetch');
+
 
 class TencentCos{
 
@@ -22,13 +24,46 @@ class TencentCos{
         return parseInt(data.headers['content-length']);
     }
 
-    async getStream(cosObject, outputStream){
-        const resStream = this.client.getObjectStream({
+    async sizeByProcess(cosObject, process){
+        const data = await this.promiseWrap(this.client.getObjectUrl, {
+            Bucket: this.bucket,
+            Region: this.region,
+            Key: cosObject,
+            Sign: true,
+            Expires: 3600, // 单位秒
+        });
+
+        const url = data.Url + '&' + process;
+
+        const res  = await fetch(url);
+        const buf = await res.buffer();
+        return buf.length;
+    }
+
+    async getStream(cosObject, outPutStream){
+        let resStream = await this.client.getObjectStream({
             Bucket: this.bucket,
             Region: this.region,
             Key: cosObject
         });
-        resStream.pipe(outputStream);
+
+        resStream.pipe(outPutStream);
+    }
+
+    async getStreamByProcess(cosObject, process, outPutStream){
+        const data = await this.promiseWrap(this.client.getObjectUrl, {
+            Bucket: this.bucket,
+            Region: this.region,
+            Key: cosObject,
+            Sign: true,
+            Expires: 3600, // 单位秒
+        });
+
+        const url = data.Url + '&' + process;
+
+        const res  = await fetch(url);
+
+        res.body.pipe(outPutStream);
     }
 
     promiseWrap(fn, param){

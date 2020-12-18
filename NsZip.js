@@ -21,8 +21,14 @@ class NsZip{
     async total(){
         let total = 0
         for(const file of this.files){
-            let fileSize = await this.client.size(file)
-            total += fileSize
+            let fileSize = 0;
+            if(typeof file === 'string'){
+                fileSize = await this.client.size(file);
+            }
+            else{
+                fileSize = await this.client.sizeByProcess(file.object, file.process);
+            }
+            total += fileSize;
         }
         return total;
     }
@@ -30,6 +36,15 @@ class NsZip{
     attach(objects, zipObject){
         this.files = objects;
         this.zipObject = zipObject;
+    }
+
+    fetchObjectKey(object){
+        if(typeof object === 'string'){
+            return object;
+        }
+        else{
+            return object.object;
+        }
     }
 
     async run(){
@@ -48,12 +63,20 @@ class NsZip{
         for(const file of this.files){
             const progressStream = this.makeTransform();
 
-            let [getStreamErr] = await this.errorCatch(this.client, this.client.getStream, file, progressStream);
+            let getStreamErr = null;
+
+            if(typeof file === 'string'){
+                [getStreamErr] = await this.errorCatch(this.client, this.client.getStream, file, progressStream);
+            }
+            else{
+                [getStreamErr] = await this.errorCatch(this.client, this.client.getStreamByProcess, file.object, file.process, progressStream);
+            }
+
             if(getStreamErr){
                 return this.triggerError(getStreamErr);
             }
 
-            this.archive.append(progressStream, { name: file.split('/').pop() });
+            this.archive.append(progressStream, { name: this.fetchObjectKey(file).split('/').pop() });
         }
         this.archive.finalize();
     }

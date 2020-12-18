@@ -180,3 +180,29 @@ const nszip = new NsZip("TencentCos", {
    miniChunkSize: 100 * 1024*1024 //100Mb
 });
 ```
+
+#### 打包压缩处理后图片
+
+attach方法的第一个参数的数组元素支持对象，对象格式为 { object: $key, process: $process}
+
+process 的格式根据不同平台的格式而定
+
+```javascript
+
+//腾讯云cos
+nszip.attach([
+    { object: 'smaple.jpg', process: 'watermark/1/image/aHR0cDovL2V4YW1wbGVzLTEyNTEwMDAwMDQucGljc2gubXlxY2xvdWQuY29tL3NodWl5aW4uanBn/gravity/southeast'},
+    'object2',
+    'object3',
+    ...
+], 'zips/2020-11-29.zip');
+
+
+//aliyun oss
+nszip.attach([
+    { object: 'smaple.jpg', process: 'image/resize,m_fixed,w_100,h_100'},
+    'object2',
+    'object3',
+    ...
+], 'zips/2020-11-29.zip');
+```
