@@ -11,10 +11,10 @@
   "dependencies": {
     "ali-oss": "^6.11.2",
     "archiver": "^5.1.0",
-    "cos-nodejs-sdk-v5": "^2.8.3"
+    "cos-nodejs-sdk-v5": "^2.8.3",
+    "node-fetch": "^2.6.1"
   },
   "devDependencies": {
-    "crypto-js": "^4.0.0",
-    "node-fetch": "^2.6.1"
+    "crypto-js": "^4.0.0"
   }
 }
